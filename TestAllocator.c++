@@ -102,15 +102,13 @@ int main () {
     using namespace std;
     ios_base::sync_with_stdio(false);    // turn off synchronization with C I/O
     cout << "TestAllocator.c++" << endl;
-
     CppUnit::TextTestRunner tr;
 
-    tr.addTest(TestAllocator< std::allocator<int> >::suite());
-//  tr.addTest(TestAllocator< Allocator<int, 100> >::suite()); // uncomment!
+    //tr.addTest(TestAllocator< std::allocator<int> >::suite());
+    tr.addTest(TestAllocator< Allocator<int, 100> >::suite()); 
 
-    tr.addTest(TestAllocator< std::allocator<double> >::suite());
-//  tr.addTest(TestAllocator< Allocator<double, 100> >::suite()); // uncomment!
-
+    //tr.addTest(TestAllocator< std::allocator<double> >::suite());
+    tr.addTest(TestAllocator< Allocator<double, 100> >::suite()); 
     tr.run();
 
     cout << "Done." << endl;

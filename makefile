@@ -1,5 +1,4 @@
 all:
-  make run
 	make test
 
 doc:

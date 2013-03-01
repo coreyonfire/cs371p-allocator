@@ -14,6 +14,9 @@
 #include <cassert>   // assert
 #include <new>       // new
 #include <stdexcept> // invalid_argument
+#include <iostream>
+
+using namespace std;
 
 // ---------
 // Allocator
@@ -72,13 +75,16 @@ private:
 	 * spaces have been set up with the correct sentinels.
      */
     bool valid () const {
+		std::cout << "Validating...";
         size_type cur = 0, pos = 0;
-		while (cur < N) {
-			cur = view(*(a+pos));
+		while (pos+cur+8 <= N) {
+			cur = view(*(const_cast<char*>(a+pos)));
 			if (cur < 1) cur *= -1;
-			if (cur != view(*(a+pos+cur+4))) return false;
+			if (cur != view(*(const_cast<char*>(a+pos+cur+4)))) return false;
 			pos += (cur + 8);
 		}
+		
+		std::cout << "valid!" << std::endl;
         return true;
     }
 
@@ -93,8 +99,8 @@ public:
      * <your documentation>
      */
     Allocator () {
-        *a = N - 8;
-		*(a + N - 4) = N - 8;
+        view(*a) = N - 8;
+		view(*(a + N - 4)) = N - 8;
         assert(valid());
     }
 
@@ -116,30 +122,33 @@ public:
      * choose the first block that fits
      */
     pointer allocate (size_type n) {
+		std::cout << "Allocating for " << n*sizeof(T) << " bytes!" << std::endl;
 		assert(n > 0);
 		n *= sizeof(T);
-		size_type pos = cur = 0;
-		while (pos < N) {
+		size_type pos = 0, cur = 0;
+		while (pos+cur+8 <= N) {
 			cur = view(*(a+pos));
+			cout << cur << endl;
 			assert (pos + cur + 8 <= N);
-			if (cur < 1) {
+			if (cur < 1 || cur < n) {
 				pos += (cur * -1 + 8); // skip taken block
 				continue; // move on to next block
 			}
-			if (cur >= n && pos + cur + 8 < N) {
-				pointer block = a+pos;
-				*(a+pos) = -n;
-				if ((pos+cur+8)-(pos+n+8) < sizeof(T)+8) {
+			if (cur >= n && pos + cur + 8 <= N) {
+				pointer block =  reinterpret_cast<T*>(a+pos);
+				view(*(a+pos)) = -n;
+				if ((unsigned)((pos+cur+8)-(pos+n+8)) < (unsigned)sizeof(T)+8) {
 					// give them all
-					*(pos+cur+4) = -n;
+					view(*(a+pos+cur+4)) = -n;
 				}
 				else { 
 					// give them what they need and fix sentinels
-					*(pos+n+4) = -n;
-					*(pos+n+8) = *(pos+cur+4) = cur - n - 8;
+					view(*(a+pos+n+4)) = -n;
+					view(*(a+pos+n+8)) = view(*(a+pos+cur+4)) = cur - n - 8;
 				}
 				return block;
 			}
+			
 		}
 		
         assert(valid());
@@ -188,7 +197,7 @@ public:
      * <your documentation>
      */
     void destroy (pointer p) {
-        // p->~T();            // uncomment!
+        p->~T();            // uncomment!
         assert(valid());
     }
 	
@@ -200,7 +209,7 @@ public:
 	 * Take a byte, return it and the following 4 bytes.
 	 *
 	 */
-	int& view (char& c) {
+	int& view (char& c) const {
 		return *reinterpret_cast<int*>(&c);
 	}
 };
