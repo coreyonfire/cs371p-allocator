@@ -93,7 +93,8 @@ public:
      * <your documentation>
      */
     Allocator () {
-        // <your code>
+        *a = N - 8;
+		*(a + N - 4) = N - 8;
         assert(valid());
     }
 
@@ -109,17 +110,18 @@ public:
     /**
      * O(1) in space
      * O(n) in time
-     * <your documentation>
+     * @param n Takes looks 
      * after allocation there must be enough space left for a valid block
      * the smallest allowable block is sizeof(T) + (2 * sizeof(int))
      * choose the first block that fits
      */
     pointer allocate (size_type n) {
 		assert(n > 0);
-		size_type pos;
-        size_type cur = 0;
-		while (cur < N) {
+		n *= sizeof(T);
+		size_type pos = cur = 0;
+		while (pos < N) {
 			cur = view(*(a+pos));
+			assert (pos + cur + 8 <= N);
 			if (cur < 1) {
 				pos += (cur * -1 + 8); // skip taken block
 				continue; // move on to next block
@@ -127,11 +129,14 @@ public:
 			if (cur >= n && pos + cur + 8 < N) {
 				pointer block = a+pos;
 				*(a+pos) = -n;
-				if (N-(pos+cur+8) < sizeof(T)+8) {// give them all
+				if ((pos+cur+8)-(pos+n+8) < sizeof(T)+8) {
+					// give them all
 					*(pos+cur+4) = -n;
 				}
-				else { // give them what they need and fix sentinels
+				else { 
+					// give them what they need and fix sentinels
 					*(pos+n+4) = -n;
+					*(pos+n+8) = *(pos+cur+4) = cur - n - 8;
 				}
 				return block;
 			}
@@ -151,7 +156,10 @@ public:
      * <your documentation>
      */
     void construct (pointer p, const_reference v) {
-        // new (p) T(v);                            // uncomment!
+        new (p) T(v);                            // uncomment!
+		
+		
+		
         assert(valid());
     } 
 
