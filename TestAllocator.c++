@@ -56,7 +56,8 @@ struct TestAllocator : CppUnit::TestFixture {
         x.construct(p, v);
         CPPUNIT_ASSERT(*p == v);
         x.destroy(p);
-        x.deallocate(p, s);}
+        x.deallocate(p, s);
+    }
 
     // --------
     // test_ten
@@ -83,7 +84,40 @@ struct TestAllocator : CppUnit::TestFixture {
         while (b != e) {
             --e;
             x.destroy(e);}
-        x.deallocate(b, s);}
+        x.deallocate(b, s);
+    }
+        
+    // --------
+    // test_bad
+    // --------
+    
+    void test_bad () {
+        A x;
+        const difference_type s = 10;
+        const pointer         b = x.allocate(s);
+        try {
+            x.allocate(s);
+        	CPPUNIT_ASSERT(false);
+       	}
+        catch (...) {
+            x.deallocate(b, s);
+        }
+        
+    }
+    
+    // --------
+    // test_zro
+    // --------
+
+	void test_zro () {
+        A x;
+        const difference_type s = 0;
+        pointer b;
+        b = x.allocate(s);
+        cout << endl <<b << endl;
+    	CPPUNIT_ASSERT(b == 0);
+        
+    }
 
     // -----
     // suite
@@ -92,6 +126,8 @@ struct TestAllocator : CppUnit::TestFixture {
     CPPUNIT_TEST_SUITE(TestAllocator);
     CPPUNIT_TEST(test_one);
     CPPUNIT_TEST(test_ten);
+    CPPUNIT_TEST(test_bad);
+    CPPUNIT_TEST(test_zro);
     CPPUNIT_TEST_SUITE_END();};
 
 // ----
