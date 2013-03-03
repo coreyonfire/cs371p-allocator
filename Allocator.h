@@ -16,6 +16,8 @@
 #include <stdexcept> // invalid_argument
 #include <iostream>
 
+#define private public
+
 using namespace std;
 
 // ---------
@@ -128,7 +130,7 @@ public:
      * choose the first block that fits
      */
     pointer allocate (size_type n) {
-		std::cout << "[ALLOC]Allocating for " << n*sizeof(T) << " bytes!" << std::endl;
+		//std::cout << "[ALLOC]Allocating for " << n*sizeof(T) << " bytes!" << std::endl;
 		pointer block = 0;
 		if (n == 0) return block;
 		n *= sizeof(T);

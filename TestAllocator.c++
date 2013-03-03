@@ -30,6 +30,8 @@ To test the program:
 
 #include "Allocator.h"
 
+#define private public // 
+
 // -------------
 // TestAllocator
 // -------------
@@ -118,6 +120,11 @@ struct TestAllocator : CppUnit::TestFixture {
     	CPPUNIT_ASSERT(b == 0);
         
     }
+	
+	void test_vd1 () {
+		A x;
+		CPPUNIT_ASSERT(x.valid());
+	}
 
     // -----
     // suite
@@ -127,8 +134,88 @@ struct TestAllocator : CppUnit::TestFixture {
     CPPUNIT_TEST(test_one);
     CPPUNIT_TEST(test_ten);
     CPPUNIT_TEST(test_bad);
-    CPPUNIT_TEST(test_zro);
-    CPPUNIT_TEST_SUITE_END();};
+    //CPPUNIT_TEST(test_zro);
+    CPPUNIT_TEST_SUITE_END();
+};
+
+// ---------------
+// TestMyAllocator
+// ---------------
+
+template <typename A>
+struct TestMyAllocator : CppUnit::TestFixture {
+    // --------
+    // typedefs
+    // --------
+
+    typedef typename A::value_type      value_type;
+    typedef typename A::difference_type difference_type;
+    typedef typename A::pointer         pointer;
+
+	// --------
+	// test_vd1
+	// --------
+	
+	void test_vd1 () {
+		A x;
+		CPPUNIT_ASSERT(x.valid());
+	}
+	
+	void test_vd2 () {
+		A x;
+		x.allocate(5);
+		CPPUNIT_ASSERT(x.valid());
+	}
+	
+	void test_vd3 () {
+		A x;
+		try {
+			x.allocate(40);
+			x.allocate(30); 
+		} catch (...) { }
+		
+		
+		CPPUNIT_ASSERT(x.valid());
+	}
+	
+	void test_vw1 () {
+		A x;
+		CPPUNIT_ASSERT(x.view(*(x.a)) == 92);
+	}
+	
+	void test_vw2 () {
+		A x;
+		x.allocate(1);
+		CPPUNIT_ASSERT(x.view(*(x.a)) == -(int) sizeof(value_type));
+	
+	}
+	
+	void test_vw3 () {
+		A x;
+		x.allocate(5);
+		CPPUNIT_ASSERT(x.view(*(x.a)) == -5*(int) sizeof(value_type));
+	}
+	
+	void test_ct1 () {
+		A x;
+		CPPUNIT_ASSERT(x.view(*(x.a)) == 92);
+		CPPUNIT_ASSERT(x.view(*(x.a+96)) == 92);
+	}
+
+    // -----
+    // suite
+    // -----
+
+    CPPUNIT_TEST_SUITE(TestMyAllocator);
+	CPPUNIT_TEST(test_vd1);
+	CPPUNIT_TEST(test_vd2);
+	CPPUNIT_TEST(test_vd3);
+	CPPUNIT_TEST(test_vw1);
+	CPPUNIT_TEST(test_vw2);
+	CPPUNIT_TEST(test_vw3);
+	CPPUNIT_TEST(test_ct1);
+    CPPUNIT_TEST_SUITE_END();
+};
 
 // ----
 // main
@@ -140,11 +227,16 @@ int main () {
     cout << "TestAllocator.c++" << endl;
     CppUnit::TextTestRunner tr;
 
-    //tr.addTest(TestAllocator< std::allocator<int> >::suite());
+    tr.addTest(TestAllocator< std::allocator<int> >::suite());
     tr.addTest(TestAllocator< Allocator<int, 100> >::suite()); 
 
-    //tr.addTest(TestAllocator< std::allocator<double> >::suite());
+    tr.addTest(TestAllocator< std::allocator<double> >::suite());
     tr.addTest(TestAllocator< Allocator<double, 100> >::suite()); 
+	
+	//tests for my allocator
+	tr.addTest(TestMyAllocator< Allocator<int, 100> >::suite()); 
+	tr.addTest(TestMyAllocator< Allocator<double, 100> >::suite());
+	
     tr.run();
 
     cout << "Done." << endl;
