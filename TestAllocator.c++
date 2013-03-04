@@ -106,25 +106,8 @@ struct TestAllocator : CppUnit::TestFixture {
         }
         
     }
-    
-    // --------
-    // test_zro
-    // --------
-
-	void test_zro () {
-        A x;
-        const difference_type s = 0;
-        pointer b;
-        b = x.allocate(s);
-        cout << endl <<b << endl;
-    	CPPUNIT_ASSERT(b == 0);
-        
-    }
 	
-	void test_vd1 () {
-		A x;
-		CPPUNIT_ASSERT(x.valid());
-	}
+	
 
     // -----
     // suite
@@ -236,6 +219,8 @@ int main () {
 	//tests for my allocator
 	tr.addTest(TestMyAllocator< Allocator<int, 100> >::suite()); 
 	tr.addTest(TestMyAllocator< Allocator<double, 100> >::suite());
+	
+	//tr.addTest(TestMyAllocator< Allocator<double, 4> >::suite());
 	
     tr.run();
 

@@ -1,0 +1,77 @@
+commit 99e017b64f687a7e1f87a88a58970953c3f8f516
+Author: Corey Besmer <cs.utexas.edu>
+Date:   Sat Mar 2 20:00:34 2013 -0600
+
+    Added documentation.
+
+commit 48ec579cfe7a1505b421e6fce5a816dc102f756d
+Author: Corey Besmer <cs.utexas.edu>
+Date:   Sat Mar 2 19:46:39 2013 -0600
+
+    Added test cases. Everything seems to be working, so i guess I'm done?
+
+commit 142c6915a86a879333f5c78efab47bad8a795c3e
+Author: Corey Besmer <cs.utexas.edu>
+Date:   Fri Mar 1 15:56:10 2013 -0600
+
+    All done, writing test files now.
+
+commit adb450df50dec819eae353e1ab6d310b0b2c5053
+Author: Corey Besmer <cs.utexas.edu>
+Date:   Fri Mar 1 14:08:16 2013 -0600
+
+    Making finishing touches on deallocate and valid.
+
+commit 8517fb78e9ff4b1e7dfc2f36875f78edafd4ba2e
+Author: Corey Besmer <cs.utexas.edu>
+Date:   Thu Feb 28 19:53:55 2013 -0600
+
+    Added to allocate(). Need to add issues later.
+
+commit 940def568d606fe5a5b63534541357bd29119766
+Author: Corey Besmer <cs.utexas.edu>
+Date:   Thu Feb 28 18:32:16 2013 -0600
+
+    Finished up allocate(), valid(), now working on construct().
+
+commit b8ffa8e9658d35a4face350509a315ec71e8ed03
+Author: Corey Besmer <cs.utexas.edu>
+Date:   Thu Feb 28 17:50:42 2013 -0600
+
+    Modified .gitignore
+
+commit b0d2f59293763daabf1fdd6560743707622635dd
+Author: Corey Besmer <cs.utexas.edu>
+Date:   Thu Feb 28 17:47:41 2013 -0600
+
+    Added valid() function. Working on allocate() now.
+
+commit 9ab3ce78c91782f2d65242f10aac0d9028ac1323
+Author: coreyonfire <coreyonfire@gmail.com>
+Date:   Mon Feb 25 16:27:01 2013 -0600
+
+    Create makefile
+
+commit 0cbe981f36eaa32a0acb10ba80a68d3e961a96ba
+Author: coreyonfire <coreyonfire@gmail.com>
+Date:   Mon Feb 25 16:26:40 2013 -0600
+
+    Create TestAllocator.c++
+
+commit 6c4ee998411398f6cd1ab4129f96dfb32589c144
+Author: coreyonfire <coreyonfire@gmail.com>
+Date:   Mon Feb 25 16:26:12 2013 -0600
+
+    Create 371p.sh
+
+commit 7cb9d50ebf7eb4f0d73f88294759500824f5775e
+Author: coreyonfire <coreyonfire@gmail.com>
+Date:   Mon Feb 25 16:25:47 2013 -0600
+
+    Create Allocator.h
+
+commit e725dd3afed4d26fead35617cb5c53affb8bb98f
+Author: coreyonfire <coreyonfire@gmail.com>
+Date:   Mon Feb 25 14:24:45 2013 -0800
+
+    Initial commit

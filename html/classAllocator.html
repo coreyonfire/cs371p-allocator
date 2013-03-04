@@ -197,7 +197,7 @@ template&lt;typename T , int N&gt; </div>
       </table>
 </div>
 <div class="memdoc">
-<p>O(1) in space O(1) in time &lt;your documentation&gt;=""&gt; </p>
+<p>O(1) in space O(1) in time General constructor for <a class="el" href="classAllocator.html">Allocator</a>. Sets up sentinels and whatnot. </p>
 
 </div>
 </div>
@@ -222,7 +222,7 @@ template&lt;typename T , int N&gt; </div>
 <p>O(1) in space O(n) in time </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>n</em>&nbsp;</td><td>Takes looks after allocation there must be enough space left for a valid block the smallest allowable block is sizeof(T) + (2 * sizeof(int)) choose the first block that fits </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>n</em>&nbsp;</td><td>Looks for n bytes to allocate, returns a pointer to said bytes. after allocation there must be enough space left for a valid block the smallest allowable block is sizeof(T) + (2 * sizeof(int)) choose the first block that fits </td></tr>
   </table>
   </dd>
 </dl>
@@ -255,7 +255,7 @@ template&lt;typename T , int N&gt; </div>
       </table>
 </div>
 <div class="memdoc">
-<p>O(1) in space O(1) in time &lt;your documentation&gt;=""&gt; </p>
+<p>O(1) in space O(1) in time Create a new T based on v at location p. Do not allocate, just construct. </p>
 
 </div>
 </div>
@@ -285,7 +285,7 @@ template&lt;typename T , int N&gt; </div>
       </table>
 </div>
 <div class="memdoc">
-<p>O(1) in space O(1) in time &lt;your documentation&gt;=""&gt; after deallocation adjacent free blocks must be coalesced </p>
+<p>O(1) in space O(1) in time Deallocate block located at p. Coalesce all adjacent free blocks. after deallocation adjacent free blocks must be coalesced </p>
 
 </div>
 </div>
@@ -306,7 +306,7 @@ template&lt;typename T , int N&gt; </div>
       </table>
 </div>
 <div class="memdoc">
-<p>O(1) in space O(1) in time &lt;your documentation&gt;=""&gt; </p>
+<p>O(1) in space O(1) in time Destroy the T at location p. </p>
 
 </div>
 </div>
@@ -444,7 +444,7 @@ template&lt;typename T , int N&gt; </div>
 </iframe>
 </div>
 
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Sat Mar 2 20:00:27 2013 by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Mon Mar 4 14:13:37 2013 by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

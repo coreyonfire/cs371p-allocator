@@ -31,3 +31,7 @@ zip:
 
 clean:
 	rm -f TestAllocator
+	
+zip-submit:
+	make zip
+	make turnin-submit

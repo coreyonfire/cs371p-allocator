@@ -1,0 +1,10 @@
+g++ -pedantic -std=c++0x -Wall TestAllocator.c++ -o TestAllocator -lcppunit -ldl
+TestAllocator
+TestAllocator.c++
+..........................
+
+
+OK (26 tests)
+
+
+Done.

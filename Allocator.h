@@ -1,7 +1,7 @@
 // ------------------------------
 // projects/allocator/Allocator.h
 // Copyright (C) 2013
-// Glenn P. Downing
+// Corey M. Besmer
 // ------------------------------
 
 #ifndef Allocator_h
@@ -77,22 +77,13 @@ private:
 	 * spaces have been set up with the correct sentinels.
      */
     bool valid () const {
-		//std::cout << "[VALID] Validating..." << endl;
-		
-		//for (int i = 0; i < N; i+=4) {
-		//	cout << view(*(const_cast<char*>(a)+i)) << endl;
-		//}
-		
         size_type cur = 0, pos = 0;
 		while (pos+cur+8 <= N) {
 			cur = view(*((const_cast<char*>(a)+pos)));
-			//cout << "[" << cur << "]=[" << view(*(const_cast<char*>(a)+pos+abs(cur)+4)) << "]" << endl;
-
 			if (cur != view(*((const_cast<char*>(a))+pos+abs(cur)+4))) return false;
 			if (cur < 0) cur *= -1;
 			pos += (cur + 8);
 		}
-		//cout <<  "...all good!" << endl;
         return true;
     }
 
@@ -104,9 +95,11 @@ public:
     /**
      * O(1) in space
      * O(1) in time
-     * <your documentation>
+     * General constructor for Allocator. Sets up sentinels and whatnot.
      */
     Allocator () {
+    	//ensure i have enough space
+    	assert (N > sizeof(int)*2 + sizeof(T));
         view(*a) = N - 8;
 		view(*(a + N - 4)) = N - 8;
         assert(valid());
@@ -124,13 +117,12 @@ public:
     /**
      * O(1) in space
      * O(n) in time
-     * @param n Takes looks 
+     * @param n Looks for n bytes to allocate, returns a pointer to said bytes.
      * after allocation there must be enough space left for a valid block
      * the smallest allowable block is sizeof(T) + (2 * sizeof(int))
      * choose the first block that fits
      */
     pointer allocate (size_type n) {
-		//std::cout << "[ALLOC]Allocating for " << n*sizeof(T) << " bytes!" << std::endl;
 		pointer block = 0;
 		if (n == 0) return block;
 		n *= sizeof(T);
@@ -138,46 +130,29 @@ public:
 		while (pos+cur+8 <= N) {
 			cur = view(*(a+pos));
 			//assert (pos + cur + 8 <= N);
-			
 			if (cur >= n+8 && pos + cur + 8 <= N) {
 				block =  reinterpret_cast<T*>(a+pos+4);
 				if ((unsigned)((pos+cur+8)-(pos+n+8)) < (unsigned)sizeof(T)+8) {
 					// give them all
-					//cout << "Problem?" << endl;
-					
-					
 					view(*(a+pos)) = -cur;
 					view(*(a+pos+cur+4)) = -cur;
-					//cout << "[ALLOC]Setting lead sentinel to " << view(*(a+pos)) << endl;
-					//cout << "[ALLOC]Setting end sentinel to " << view(*(a+pos+cur+4)) << endl;
-					
 				}
 				else { 
 					// give them what they need and fix sentinels
-					//cout << cur << ", " << n << endl;
-					
 					view(*(a+pos)) = -n;
 					view(*(a+pos+n+4)) = -n;
 					view(*(a+pos+n+8)) = view(*(a+pos+cur+4)) = cur - n - 8;
-					//cout << "[ALLOC]Setting lead sentinel to " << view(*(a+pos)) << endl;
-					//cout << "[ALLOC]Setting end sentinel to " << view(*(a+pos+n+4)) << endl;
-					//cout << "[ALLOC]Block after is " << view(*(a+pos+n+8)) << " - " << view(*(a+pos+cur+4)) << endl;
 				}
-				
 				assert(valid());
 				return block;
 			}
-			//if (cur < 1 || cur < n) {
 			pos += (abs(cur) + 8); // skip taken block
-			//}
-			
 		}
-		
         assert(valid());
 		bad_alloc exception;
      	throw exception;
         return 0;
-    }                   // replace!
+    }
 
     // ---------
     // construct
@@ -186,11 +161,10 @@ public:
     /**
      * O(1) in space
      * O(1) in time
-     * <your documentation>
+     * Create a new T based on v at location p. Do not allocate, just construct.
      */
     void construct (pointer p, const_reference v) {
-		//cout << "[CONSTRUCT]Constructing at " << p-(pointer)a << endl;
-        new (p) T(v);                            // uncomment!		
+        new (p) T(v);	
         assert(valid());
     } 
 
@@ -201,28 +175,22 @@ public:
     /**
      * O(1) in space
      * O(1) in time
-     * <your documentation>
+     * Deallocate block located at p. Coalesce all adjacent free blocks.
      * after deallocation adjacent free blocks must be coalesced
      */
     void deallocate (pointer p, size_type = 0) {
-		//cout << "[DEALLOC] Deallocating at " << p-(pointer)a << endl;
 		size_type pre = -1, nex = -1, cur = -1, newsize = 0;
-		
         //check the previous and next blocks
 		if (p != (pointer)(a+4)) pre = view(*(reinterpret_cast<char*>(p)-8));
 		cur = view(*(reinterpret_cast<char*>(p)-4));
 		if (abs(cur)+4 != N-4) nex = view(*(reinterpret_cast<char*>(p)-cur+4));
-		
 		assert(cur < 0);
 		if (pre > 0) newsize += pre+8;
 		else pre = 0;
-		
 		if (nex > 0) newsize += nex+8;
 		else if (cur == -N+8) nex = -8;
 		else nex = 0;
-		
 		newsize -= cur;
-		//cout << pre << ", " << cur << ", " << nex  << ", " << newsize  << ", " << N << endl;
 		view(*(reinterpret_cast<char*>(p)-pre-4)) = view(*(reinterpret_cast<char*>(p)+8-cur+nex)) = newsize;
         assert(valid());
     } 
@@ -234,11 +202,10 @@ public:
     /**
      * O(1) in space
      * O(1) in time
-     * <your documentation>
+     * Destroy the T at location p.
      */
     void destroy (pointer p) {
-		//cout << "[DESTROY] Destroying at " << p-(pointer)a << endl;
-        p->~T();            // uncomment!
+        p->~T();
         assert(valid());
     }
 	
