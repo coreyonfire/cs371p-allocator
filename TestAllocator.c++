@@ -153,8 +153,8 @@ struct TestMyAllocator : CppUnit::TestFixture {
 	void test_vd3 () {
 		A x;
 		try {
-			x.allocate(40);
-			x.allocate(30); 
+			x.allocate(x.length/2);
+			x.allocate(x.length/2); 
 		} catch (...) { }
 		
 		
@@ -163,7 +163,7 @@ struct TestMyAllocator : CppUnit::TestFixture {
 	
 	void test_vw1 () {
 		A x;
-		CPPUNIT_ASSERT(x.view(*(x.a)) == 92);
+		CPPUNIT_ASSERT(x.view(*(x.a)) == x.length - 8);
 	}
 	
 	void test_vw2 () {
@@ -181,9 +181,112 @@ struct TestMyAllocator : CppUnit::TestFixture {
 	
 	void test_ct1 () {
 		A x;
-		CPPUNIT_ASSERT(x.view(*(x.a)) == 92);
-		CPPUNIT_ASSERT(x.view(*(x.a+96)) == 92);
+		CPPUNIT_ASSERT(x.view(*(x.a)) == x.length - 8);
+		CPPUNIT_ASSERT(x.view(*(x.a+(x.length - 4))) == x.length - 8);
 	}
+	
+	void test_neg () {
+		A x; 
+		try {
+			x.allocate(-1);
+			CPPUNIT_ASSERT(false);
+		} catch (...) {}
+	}
+	
+	void test_dlc () {
+		A x;
+		pointer b = x.allocate(1);
+		x.deallocate(b);
+		CPPUNIT_ASSERT(x.view(*(x.a)) == x.length - 8);
+	}
+	
+	void test_dl2 () {
+		A x;
+		pointer b = x.allocate(1);
+		pointer c = x.allocate(1);
+		x.deallocate(b);
+		x.deallocate(c);
+		CPPUNIT_ASSERT(x.view(*(x.a)) == x.length - 8);
+	}
+	
+	void test_dl3 () {
+		A x;
+		pointer b = x.allocate(1);
+		pointer c = x.allocate(1);
+		pointer d = x.allocate(1);
+		pointer e = x.allocate(1);
+		x.deallocate(d);
+		x.deallocate(b);
+		x.deallocate(e);
+		x.deallocate(c);
+		
+		CPPUNIT_ASSERT(x.view(*(x.a)) == x.length - 8);
+	}
+	
+	void test_dl4 () {
+		A x;
+		pointer b;
+		pointer c;
+		pointer d;
+		pointer e;
+		try {
+			b = x.allocate(2);
+			c = x.allocate(1);
+			d = x.allocate(2);
+			e = x.allocate(1);
+		} catch (...) {
+			CPPUNIT_ASSERT(false);
+		}
+		
+		x.deallocate(d);
+		x.deallocate(b);
+		x.deallocate(e);
+		x.deallocate(c);
+		
+		CPPUNIT_ASSERT(x.view(*(x.a)) == x.length - 8);
+	}
+	
+	void test_dl5 () {
+		A x;
+		x.allocate(1);
+		pointer c = x.allocate(1);
+		x.deallocate(c);
+		CPPUNIT_ASSERT(x.view(*(x.a)) == (int) -sizeof(value_type));
+		CPPUNIT_ASSERT(x.view(*(x.a+8+(int) sizeof(value_type))) == (int) x.length -(16+ (int) sizeof(value_type)));
+	}
+	
+	// --------
+    // test_ten
+    // --------
+
+    void test_str () {
+        A x;
+        const difference_type s = (x.length-16)/sizeof(value_type);
+        const value_type      v = 2;
+        const pointer         b = x.allocate(s);
+              pointer         e = b + s;
+              pointer         p = b;
+        try {
+            while (p != e) {
+                x.construct(p, v);
+                ++p;
+			}
+		}
+        catch (...) {
+            while (b != p) {
+                --p;
+                x.destroy(p);
+			}
+            x.deallocate(b, s);
+            throw;
+		}
+        CPPUNIT_ASSERT(std::count(b, e, v) == s);
+        while (b != e) {
+            --e;
+            x.destroy(e);
+		}
+        x.deallocate(b, s);
+    }
 
     // -----
     // suite
@@ -197,6 +300,13 @@ struct TestMyAllocator : CppUnit::TestFixture {
 	CPPUNIT_TEST(test_vw2);
 	CPPUNIT_TEST(test_vw3);
 	CPPUNIT_TEST(test_ct1);
+	CPPUNIT_TEST(test_neg);
+	CPPUNIT_TEST(test_dlc);
+	CPPUNIT_TEST(test_dl2);
+	CPPUNIT_TEST(test_dl3);
+	CPPUNIT_TEST(test_dl4);
+	CPPUNIT_TEST(test_dl5);
+	CPPUNIT_TEST(test_str);
     CPPUNIT_TEST_SUITE_END();
 };
 
@@ -210,17 +320,38 @@ int main () {
     cout << "TestAllocator.c++" << endl;
     CppUnit::TextTestRunner tr;
 
+	//test for both
     tr.addTest(TestAllocator< std::allocator<int> >::suite());
-    tr.addTest(TestAllocator< Allocator<int, 100> >::suite()); 
-
+    tr.addTest(TestAllocator< std::allocator<float> >::suite());
+    tr.addTest(TestAllocator< std::allocator<long> >::suite());
     tr.addTest(TestAllocator< std::allocator<double> >::suite());
+    tr.addTest(TestAllocator< Allocator<float, 100> >::suite());
+    tr.addTest(TestAllocator< Allocator<long, 100> >::suite()); 
+    tr.addTest(TestAllocator< Allocator<int, 100> >::suite()); 
     tr.addTest(TestAllocator< Allocator<double, 100> >::suite()); 
 	
 	//tests for my allocator
 	tr.addTest(TestMyAllocator< Allocator<int, 100> >::suite()); 
 	tr.addTest(TestMyAllocator< Allocator<double, 100> >::suite());
+	tr.addTest(TestMyAllocator< Allocator<float, 100> >::suite());
+	tr.addTest(TestMyAllocator< Allocator<char, 100> >::suite());
+	tr.addTest(TestMyAllocator< Allocator<long, 100> >::suite());
 	
-	//tr.addTest(TestMyAllocator< Allocator<double, 4> >::suite());
+	
+	tr.addTest(TestMyAllocator< Allocator<int, 1000> >::suite()); 
+	tr.addTest(TestMyAllocator< Allocator<double, 1000> >::suite());
+	tr.addTest(TestMyAllocator< Allocator<float, 1000> >::suite());
+	tr.addTest(TestMyAllocator< Allocator<char, 1000> >::suite()); 
+	tr.addTest(TestMyAllocator< Allocator<long, 1000> >::suite()); 
+	
+	tr.addTest(TestMyAllocator< Allocator<int, 10000> >::suite()); 
+	tr.addTest(TestMyAllocator< Allocator<double, 10000> >::suite());
+	tr.addTest(TestMyAllocator< Allocator<float, 10000> >::suite());
+	tr.addTest(TestMyAllocator< Allocator<char, 10000> >::suite()); 
+	tr.addTest(TestMyAllocator< Allocator<long, 10000> >::suite()); 
+
+
+
 	
     tr.run();
 

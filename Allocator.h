@@ -65,6 +65,7 @@ private:
     // ----
 
     char a[N];
+	size_type length;
 
     // -----
     // valid
@@ -77,6 +78,11 @@ private:
 	 * spaces have been set up with the correct sentinels.
      */
     bool valid () const {
+		//cout << "Validating..." << endl;
+		//for (int i = 0; i < N; i+=4) {
+		//	cout << view(*(const_cast<char*>(a)+i)) << endl;
+		//}
+	
         size_type cur = 0, pos = 0;
 		while (pos+cur+8 <= N) {
 			cur = view(*((const_cast<char*>(a)+pos)));
@@ -84,6 +90,7 @@ private:
 			if (cur < 0) cur *= -1;
 			pos += (cur + 8);
 		}
+		//cout << "-------" << endl;
         return true;
     }
 
@@ -100,6 +107,7 @@ public:
     Allocator () {
     	//ensure i have enough space
     	assert (N > sizeof(int)*2 + sizeof(T));
+		length = N;
         view(*a) = N - 8;
 		view(*(a + N - 4)) = N - 8;
         assert(valid());
@@ -123,6 +131,8 @@ public:
      * choose the first block that fits
      */
     pointer allocate (size_type n) {
+		bad_alloc exception;
+		if (n < 1) throw exception;
 		pointer block = 0;
 		if (n == 0) return block;
 		n *= sizeof(T);
@@ -149,7 +159,6 @@ public:
 			pos += (abs(cur) + 8); // skip taken block
 		}
         assert(valid());
-		bad_alloc exception;
      	throw exception;
         return 0;
     }
@@ -179,17 +188,27 @@ public:
      * after deallocation adjacent free blocks must be coalesced
      */
     void deallocate (pointer p, size_type = 0) {
+		//cout << "Deallocating..." << endl;
+		
 		size_type pre = -1, nex = -1, cur = -1, newsize = 0;
         //check the previous and next blocks
+		
 		if (p != (pointer)(a+4)) pre = view(*(reinterpret_cast<char*>(p)-8));
+		
 		cur = view(*(reinterpret_cast<char*>(p)-4));
+		
 		if (abs(cur)+4 != N-4) nex = view(*(reinterpret_cast<char*>(p)-cur+4));
+		
 		assert(cur < 0);
-		if (pre > 0) newsize += pre+8;
+		
+		if (pre > 0) { newsize += pre+8; pre +=8; }
 		else pre = 0;
+		
 		if (nex > 0) newsize += nex+8;
 		else if (cur == -N+8) nex = -8;
-		else nex = 0;
+		else nex = -8;
+		
+		//cout << pre << ", " << cur << ", " << nex << endl;
 		newsize -= cur;
 		view(*(reinterpret_cast<char*>(p)-pre-4)) = view(*(reinterpret_cast<char*>(p)+8-cur+nex)) = newsize;
         assert(valid());
