@@ -33,5 +33,6 @@ clean:
 	rm -f TestAllocator
 	
 zip-submit:
+	doxygen Doxyfile
 	make zip
 	make turnin-submit
