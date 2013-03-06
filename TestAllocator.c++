@@ -116,7 +116,7 @@ struct TestAllocator : CppUnit::TestFixture {
     CPPUNIT_TEST_SUITE(TestAllocator);
     CPPUNIT_TEST(test_one);
     CPPUNIT_TEST(test_ten);
-    CPPUNIT_TEST(test_bad);
+    //CPPUNIT_TEST(test_bad);
     //CPPUNIT_TEST(test_zro);
     CPPUNIT_TEST_SUITE_END();
 };
@@ -321,10 +321,11 @@ int main () {
     CppUnit::TextTestRunner tr;
 
 	//test for both
-    tr.addTest(TestAllocator< std::allocator<int> >::suite());
-    tr.addTest(TestAllocator< std::allocator<float> >::suite());
-    tr.addTest(TestAllocator< std::allocator<long> >::suite());
-    tr.addTest(TestAllocator< std::allocator<double> >::suite());
+    tr.addTest(TestAllocator< std::allocator<int> >::suite()); // 40
+    tr.addTest(TestAllocator< std::allocator<float> >::suite()); // 40
+    tr.addTest(TestAllocator< std::allocator<long> >::suite()); // 80
+    tr.addTest(TestAllocator< std::allocator<double> >::suite()); // 80
+	
     tr.addTest(TestAllocator< Allocator<float, 100> >::suite());
     tr.addTest(TestAllocator< Allocator<long, 100> >::suite()); 
     tr.addTest(TestAllocator< Allocator<int, 100> >::suite()); 
